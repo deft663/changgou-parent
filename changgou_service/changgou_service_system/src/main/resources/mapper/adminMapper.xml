@@ -1,0 +1,39 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.changgou.system.dao.AdminMapper">
+    <resultMap type="com.changgou.system.vo.AdminVo" id="adminMap">
+        <id column="id" property="id"/>
+        <result column="login_name" property="loginName"/>
+        <!--<result column="password" property="password"/>-->
+        <result column="status" property="status"/>
+        <result column="roleName" property="roleName"/>
+
+    </resultMap>
+
+    <select id="selectAdminList" resultMap="adminMap" parameterType="java.util.Map">
+            SELECT
+            t1.id,
+            t1.login_name,
+            t1.STATUS,
+            t3.NAME roleName
+            FROM
+            tb_admin t1,
+            tb_admin_role t2,
+            tb_role t3
+            WHERE
+            t1.id = t2.admin_id
+            AND t2.role_id = t3.id
+        <if test="loginName!=null and loginName!=''">
+            and t1.login_name like  CONCAT('%',#{loginName},'%')
+        </if>
+        <if test="roleId !=null and roleId!=''">
+            and t3.id = #{roleId}
+        </if>
+	</select>
+
+
+
+
+</mapper>

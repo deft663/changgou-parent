@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: sysgateway
+  cloud:
+    gateway:
+      api:
+        prefix: api
+      routes:
+        - id: goods
+          uri: lb://goods
+          predicates:
+          - Path=/brand/**,/goods/**,/category/**,/para/**,/pref/**,/sku/**,/spec/**,/spu/**,/template/**
+          filters:
+          #- StripPrefix= 1
+          - name: RequestRateLimiter #请求数限流 名字不能随便写
+            args:
+              key-resolver: "#{@ipKeyResolver}"
+              redis-rate-limiter.replenishRate: 10 #令牌桶每秒填充平均速率
+              redis-rate-limiter.burstCapacity: 20 #令牌桶总容量
+
+        - id: fastdfs
+          uri: lb://fastdfs
+          predicates:
+          - Path=/file/**
+          filters:
+          #- StripPrefix= 1
+        - id: admin
+          uri: lb://system
+          predicates:
+          - Path=/admin/**,/menu/**,/role/**,/resource/**
+          filters:
+          #- StripPrefix= 1
+        - id: business
+          uri: lb://business
+          predicates:
+            - Path=/ad/**,/activity/**
+      globalcors:
+        cors-configurations:
+          '[/**]': # 匹配所有请求
+            allowedOrigins: "*" #跨域处理 允许所有的域
+            allowedMethods: # 支持的方法
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - HEAD
+              - PATCH
+  redis:
+    host: 192.168.200.128
+    port: 6379
+server:
+  port: 9101
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:6868/eureka
+  instance:
+    prefer-ip-address: true
+changgou:
+  jwt:
+    expire: 30 # 过期时间,单位分钟
+    cookieName: CHANGGOU_TOKEN
+    cookieMaxAge: 1800 #秒

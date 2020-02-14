@@ -1,0 +1,47 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.changgou.goods.dao.CategoryMapper">
+    <resultMap type="com.changgou.goods.vo.CategoryVO" id="categroyResMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="goods_num" property="goodsNum"/>
+        <result column="is_show" property="isShow"/>
+        <result column="is_menu" property="isMenu"/>
+        <result column="seq" property="seq"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="template_id" property="templateId"/>
+        <result column="secondLevelId" property="secondLevelId"/>
+        <result column="secondLevelName" property="secondLevelName"/>
+        <result column="thirdLevelId" property="thirdLevelId"/>
+        <result column="thirdLevelName" property="thirdLevelName"/>
+    </resultMap>
+
+    <select id="selectCategoryList" resultMap="categroyResMap" parameterType="com.changgou.goods.pojo.Category">
+		SELECT
+            t1.*,
+            t2.id secondLevelId,
+            t2.NAME secondLevelName,
+            t3.id thirdLevelId,
+            t3.NAME thirdLevelName
+        FROM
+            tb_category t1
+            LEFT JOIN tb_category t2 ON t1.parent_id = t2.id
+            LEFT JOIN tb_category t3 ON t2.parent_id = t3.id
+        where 1=1
+        <if test="id!=null and id!=''">
+            and t1.id = #{id}
+        </if>
+        <if test="name!=null and name!=''">
+            and t1.name like  CONCAT('%',#{name},'%')
+        </if>
+        <if test="parentId !=null ">
+            and t1.parent_id = #{parentId}
+        </if>
+	</select>
+
+
+
+
+</mapper>
